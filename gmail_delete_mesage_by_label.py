@@ -39,7 +39,10 @@ def findUnreadCount(label):
         return int(str(arr[1]))
 
 def findLabel(driver, labelName):
-    labelElem = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#label/' + labelName + '"]')
+    try:
+        labelElem = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#label/' + labelName + '"]')
+    except:
+        labelElem = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#' + labelName.lower() + '"]')
     return labelElem.get_attribute('aria-label')
 
 def deleteEmails(driver):

@@ -1,6 +1,7 @@
 import os
 import getpass
 import time
+import sys
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -8,7 +9,7 @@ username = raw_input('Enter Gmail email: ')
 password = getpass.getpass('Enter Gmail password: ')
 labelName = raw_input('Enter the Label you want to delete: ')
 
-chromedriver = './chromedriver'
+chromedriver = './chromedriver.exe' if sys.platform == 'win32' else './chromedriver'
 os.environ['webdriver.chrome.driver'] = chromedriver
 
 def login(driver, username, password):

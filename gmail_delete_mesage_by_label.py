@@ -44,8 +44,8 @@ def deleteEmails(driver):
     unread = findUnreadCount(findLabel(driver, labelName))
     print('Remaining unread: ' + str(unread))
     while (unread > 0):
-        checkElems=driver.find_elements_by_xpath('//*[@aria-checked="false"]')
-        allCheck=checkElems[11]
+        checkElems=driver.find_element_by_id(':5').find_elements_by_xpath('//span[@aria-checked="false"]')
+        allCheck=checkElems[-1]
         allCheck.click()
         print('Selecting all email on the screen')
         time.sleep(2)

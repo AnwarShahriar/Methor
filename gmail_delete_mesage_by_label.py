@@ -11,24 +11,23 @@ labelName = raw_input('Enter the Label you want to delete: ')
 chromedriver = './chromedriver'
 os.environ['webdriver.chrome.driver'] = chromedriver
 
-driver = webdriver.Chrome(chromedriver)
-driver.get('https://mail.google.com')
+def login(driver, username, password):
+    time.sleep(5)
 
-time.sleep(5)
+    usernameElem = driver.find_element_by_id('identifierId')
+    usernameElem.send_keys(username)
+    usernameElem.send_keys(Keys.ENTER)
 
-usernameElem = driver.find_element_by_id('identifierId')
-usernameElem.send_keys(username)
-usernameElem.send_keys(Keys.ENTER)
+    time.sleep(3)
 
-time.sleep(3)
+    passwordElem = driver.find_element_by_name('password')
+    passwordElem.send_keys(password)
+    passwordElem.send_keys(Keys.ENTER)
 
-passwordElem = driver.find_element_by_name('password')
-passwordElem.send_keys(password)
-passwordElem.send_keys(Keys.ENTER)
+def loadUrl(driver, url):
+    time.sleep(5)
+    driver.get(url)
 
-time.sleep(5)
-
-driver.get('https://mail.google.com/mail/u/0/#label/' + labelName)
 
 def findUnreadCount(label):
     if label is None:
@@ -42,10 +41,11 @@ def findLabel(driver, labelName):
     return labelElem.get_attribute('aria-label')
 
 def deleteEmails(driver):
-    unread = findUnreadCount(findLabel(labelName))
+    unread = findUnreadCount(findLabel(driver, labelName))
+    print('Remaining unread: ' + str(unread))
     while (unread > 0):
         checkElems=driver.find_elements_by_xpath('//*[@aria-checked="false"]')
-        allCheck=checkElems[9]
+        allCheck=checkElems[11]
         allCheck.click()
         print('Selecting all email on the screen')
         time.sleep(2)
@@ -53,12 +53,13 @@ def deleteEmails(driver):
         delElem.click()
         print('Deleting selected emails on the screen')
         time.sleep(5)
-        unread = findUnreadCount(findLabel(labelName))
-        if label is None:
-            unread=0
-        else:
-            arr=label.split(' ')
-            unread=int(str(arr[1]))
+        unread = findUnreadCount(findLabel(driver, labelName))
         print('Remaining unread: ' + str(unread))
 
 
+# Start Working
+driver = webdriver.Chrome(chromedriver)
+loadUrl(driver, 'https://mail.google.com')
+login(driver, username, password)
+loadUrl(driver, 'https://mail.google.com/mail/u/0/#label/' + labelName)
+deleteEmails(driver)

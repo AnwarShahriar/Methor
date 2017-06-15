@@ -39,10 +39,14 @@ def findUnreadCount(label):
         return int(str(arr[1]))
 
 def findLabel(driver, labelName):
-    try:
-        labelElem = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#label/' + labelName + '"]')
-    except:
-        labelElem = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#' + labelName.lower() + '"]')
+    categories = ['Social', 'Promotions', 'Updates', 'Forums']
+    if labelName in categories:
+        labelName = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#category/' + labelName.lower() + '"]')
+    else:
+        try:
+            labelElem = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#label/' + labelName + '"]')
+        except:
+            labelElem = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#' + labelName.lower() + '"]')
     return labelElem.get_attribute('aria-label')
 
 def deleteEmails(driver):
@@ -67,5 +71,7 @@ def deleteEmails(driver):
 driver = webdriver.Chrome(chromedriver)
 loadUrl(driver, 'https://mail.google.com')
 login(driver, username, password)
+time.sleep(10)
 loadUrl(driver, 'https://mail.google.com/mail/u/0/#label/' + labelName)
+time.sleep(10)
 deleteEmails(driver)

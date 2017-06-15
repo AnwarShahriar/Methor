@@ -28,6 +28,7 @@ def login(driver, username, password):
 def loadUrl(driver, url):
     time.sleep(5)
     driver.get(url)
+    time.sleep(5)
 
 
 def findUnreadCount(label):
@@ -56,6 +57,7 @@ def deleteEmails(driver):
         time.sleep(5)
         unread = findUnreadCount(findLabel(driver, labelName))
         print('Remaining unread: ' + str(unread))
+    print('All email deleted in ' + labelName + ' label')
 
 
 # Start Working

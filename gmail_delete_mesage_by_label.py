@@ -30,29 +30,19 @@ def loadUrl(driver, url):
     driver.get(url)
     time.sleep(5)
 
-
-def findUnreadCount(label):
-    if label is None:
-        return 0
-    else:
-        arr = label.split(' ')
-        return int(str(arr[1]))
-
-def findLabel(driver, labelName):
-    categories = ['Social', 'Promotions', 'Updates', 'Forums']
-    if labelName in categories:
-        labelName = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#category/' + labelName.lower() + '"]')
-    else:
-        try:
-            labelElem = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#label/' + labelName + '"]')
-        except:
-            labelElem = driver.find_element_by_xpath('//a[@href="https://mail.google.com/mail/u/0/#' + labelName.lower() + '"]')
-    return labelElem.get_attribute('aria-label')
+def hasMoreMessage(driver):
+    try:
+        labelElems = driver.find_element_by_id(':2').find_element_by_xpath('//td[@class="TC"]')
+        if labelElems.get_attribute('class') == 'TC':
+            return False
+        else:
+            return True
+    except Exception:
+        return True
 
 def deleteEmails(driver):
-    unread = findUnreadCount(findLabel(driver, labelName))
-    print('Remaining unread: ' + str(unread))
-    while (unread > 0):
+    moreMessage = hasMoreMessage(driver)
+    while (moreMessage):
         checkElems=driver.find_element_by_id(':5').find_elements_by_xpath('//span[@aria-checked="false"]')
         allCheck=checkElems[-1]
         allCheck.click()
@@ -62,16 +52,38 @@ def deleteEmails(driver):
         delElem.click()
         print('Deleting selected emails on the screen')
         time.sleep(5)
-        unread = findUnreadCount(findLabel(driver, labelName))
-        print('Remaining unread: ' + str(unread))
+        moreMessage = hasMoreMessage(driver)
     print('All email deleted in ' + labelName + ' label')
 
+def generateUrl(labelName):
+    defaults = {
+        'Inbox': 'inbox',
+        'Starred': 'starred',
+        'Sent Mail': 'sent',
+        'Drafts': 'drafts'
+    }
+    categories = ['Social', 'Promotions', 'Updates', 'Forums']
+    
+    if labelName in categories:
+        url = 'https://mail.google.com/mail/u/0/#category/' + labelName.lower()
+    elif labelName in defaults.keys():
+        url = 'https://mail.google.com/mail/u/0/#' + defaults[labelName]
+    else:
+        arr = labelName.split(' ')
+        urlPart = ''
+        for index, part in enumerate(arr):
+            urlPart += part
+            if index != (len(arr) - 1):
+                urlPart += '+'
+        url = 'https://mail.google.com/mail/u/0/#label/' + urlPart
+    
+    return url
 
 # Start Working
 driver = webdriver.Chrome(chromedriver)
 loadUrl(driver, 'https://mail.google.com')
 login(driver, username, password)
 time.sleep(10)
-loadUrl(driver, 'https://mail.google.com/mail/u/0/#label/' + labelName)
+loadUrl(driver, generateUrl(labelName))
 time.sleep(10)
 deleteEmails(driver)
